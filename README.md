@@ -162,6 +162,8 @@ _Cloud Native | Kubernetes | DevSecOps Architect_
 ---
 
 > “Trust nothing. Automate everything.” – ZeroTrustOps
+> This project showcases how QA, DevOps, and Security integrate in modern cloud-native delivery pipelines.
+
 ```
 
 ---
