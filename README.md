@@ -54,17 +54,45 @@ A self-hosted DevSecOps platform that scans every Git push and blocks security m
 
 ## 🧭 Overview
 
-ZeroTrustOps integrates a **custom-built static analysis engine (SecTL)**, secrets detection via **Gitleaks**, a **FastAPI** backend, and a **React** dashboard. Everything runs locally with a single command.
+ZeroTrustOps scans every Git push, detects misconfigurations and secrets, and blocks insecure infrastructure before it reaches production.
 
-```
+Powered by a custom enforcement engine (SecTL), along with Gitleaks for secrets detection, it provides an end-to-end DevSecOps pipeline with automated scanning, CI/CD enforcement, and a real-time dashboard — all running locally with a single command.
+
+
+## ⚡ How it works
+
+Every push is treated as a security checkpoint. If it fails, it never deploys.
+
 git push
-  └── GitHub webhook fires
-        └── Platform clones repository
-              ├── SecTL   scans K8s, Terraform, Helm
-              └── Gitleaks scans for hardcoded secrets
-                    └── PASS / FAIL stored in PostgreSQL
-                          └── Dashboard displays results
-```
+  └── GitHub webhook triggers the scan pipeline
+        └── Repository is cloned into an isolated scan environment
+              │
+              ├── 🔍 Static Analysis (SecTL)
+              │     ├── Scans IaC: Kubernetes, Terraform, Helm
+              │     ├── Detects misconfigurations (RBAC, networking, privilege escalation)
+              │     ├── Applies 70+ security rules
+              │     └── Assigns severity levels (CRITICAL → LOW)
+              │
+              ├── 🔑 Secrets Detection (Gitleaks)
+              │     └── Identifies API keys, tokens, passwords, and exposed credentials
+              │
+              ├── 🧠 Findings Processing
+              │     ├── Normalizes results (rule_id, severity, file path)
+              │     ├── Deduplicates issues
+              │     └── Attaches precise remediation guidance
+              │
+              ├── 🚦 Enforcement Engine (CI/CD Gate)
+              │     ├── Evaluates findings against severity thresholds
+              │     └── Returns binary decision → PASS / FAIL
+              │
+              ├── 🗄️ Persistence Layer
+              │     └── Stores scan results, history, and findings in PostgreSQL
+              │
+              └── 📊 Real-time Feedback Loop
+                    ├── Updates dashboard instantly
+                    ├── Displays repo status (PASS / FAIL)
+                    ├── Shows severity breakdown
+                    └── Provides actionable fixes per finding
 
 ## 🚀 What it actually does
 
@@ -461,8 +489,8 @@ API_PORT=8000
 
 | Capability | ZeroTrustOps | Traditional Scanners |
 |-----------|-------------|---------------------|
-| Auto scan on every push | ✅ | ❌ |
-| CI/CD enforcement (fail builds) | ✅ | ⚠️ partial |
+| Scan on every push | ✅ automatic | ❌ manual / CI-only |
+| Block insecure deploys | ✅ enforced | ❌ detect only |
 | Policy enforcement (Kyverno) | ✅ | ❌ |
 | End-to-end pipeline | ✅ | ❌ |
 
@@ -490,6 +518,29 @@ go test ./...
 ```
 
 **Adding a new SecTL rule:** See `sectl/internal/scanner/k8s.go` or `terraform.go` for patterns. Each rule requires a `RuleID`, `Severity`, `Title`, `Description`, and `Remediation`.
+
+## 🧪 Example
+
+A developer pushes a Kubernetes manifest with:
+- privileged container enabled
+- latest image tag
+
+→ Scan triggers automatically  
+→ Critical issues detected  
+→ CI fails  
+→ Deployment is BLOCKED  
+
+Nothing insecure reaches production.
+
+---
+
+## 💡 Why this matters
+
+Most security tools only detect issues.
+
+ZeroTrustOps enforces them.
+
+If it's insecure, it doesn't deploy. Period.
 
 ---
 
