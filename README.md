@@ -13,9 +13,9 @@
 
 # 🔐 ZeroTrustOps Platform
 
-### **Self-Hosted DevSecOps — Scan Every Push. Block Every Misconfiguration. Deploy with Confidence.**
+### **Self-Hosted DevSecOps for Kubernetes — Scan Every Push. Block Misconfigurations Before They Reach Production.**
 
-A production-grade, self-hosted DevSecOps platform that automatically scans repositories for security misconfigurations, hardcoded secrets, and infrastructure vulnerabilities on every Git push — before it ever reaches production.
+A production-grade Micro Services , self-hosted DevSecOps platform that automatically scans repositories for security misconfigurations, hardcoded secrets, and infrastructure vulnerabilities on every Git push — before it ever reaches production.
 
 [🚀 Quick Start](#-quick-start) · [📖 Documentation](#-architecture) · [🛡️ SecTL Engine](#-sectl--security-enforcement-engine) · [🗺️ Roadmap](#-roadmap) · [🤝 Contributing](#-contributing)
 
