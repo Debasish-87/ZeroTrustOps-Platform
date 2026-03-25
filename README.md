@@ -485,16 +485,6 @@ API_PORT=8000
 
 ---
 
-## 🤔 Why not just use Trivy / Checkov?
-
-| Capability | ZeroTrustOps | Traditional Scanners |
-|-----------|-------------|---------------------|
-| Scan on every push | ✅ automatic | ❌ manual / CI-only |
-| Block insecure deploys | ✅ enforced | ❌ detect only |
-| Policy enforcement (Kyverno) | ✅ | ❌ |
-| End-to-end pipeline | ✅ | ❌ |
-
-
 ## 🤝 Contributing
 
 Contributions are welcome! Here's how to get started:
