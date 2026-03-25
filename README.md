@@ -103,13 +103,13 @@ All services run in **Docker Compose** and communicate over an internal bridge n
 │                    │   + Gitleaks    │                     │
 │                    └─────────────────┘                     │
 └────────────────────────────────────────────────────────────┘
-          ▲
-          │  GitHub Webhook (ngrok tunnel)
-          │
-    ┌─────┴──────┐
-    │  GitHub    │
-    │  Repos     │
-    └────────────┘
+                            ▲
+                            │  GitHub Webhook (ngrok tunnel)
+                            │
+                      ┌─────┴──────┐
+                      │  GitHub    │
+                      │  Repos     │
+                      └────────────┘
 ```
 
 ---
