@@ -1,0 +1,80 @@
+services:
+
+  # ── PostgreSQL Database ────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: zerotrust-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: zerotrust
+      POSTGRES_USER: zerotrust
+      POSTGRES_PASSWORD: zerotrust123
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./platform/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zerotrust"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zerotrust-net
+
+  # ── FastAPI Backend ────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: platform/api/Dockerfile
+    image: zerotrust-api:latest
+    container_name: zerotrust-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://zerotrust:zerotrust123@db:5432/zerotrust
+      SECRET_KEY: zerotrust-secret-key-change-in-production
+      SECTL_PATH: /usr/local/bin/sectl
+    volumes:
+      # Mount workspace for scanning cloned repos
+      - scan_workspace:/workspace
+      # Docker socket to run trivy/gitleaks
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - zerotrust-net
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ── React Frontend ─────────────────────────────────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: platform/web/Dockerfile
+    image: zerotrust-web:latest
+    container_name: zerotrust-web
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    environment:
+      VITE_API_URL: http://localhost:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - zerotrust-net
+
+networks:
+  zerotrust-net:
+    driver: bridge
+
+volumes:
+  db_data:
+  scan_workspace:

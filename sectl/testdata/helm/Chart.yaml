@@ -1,0 +1,6 @@
+apiVersion: v2
+name: myapp
+description: A sample Helm chart for sectl testing
+type: application
+version: 1.0.0
+appVersion: "1.2.3"

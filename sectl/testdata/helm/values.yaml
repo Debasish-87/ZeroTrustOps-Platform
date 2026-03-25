@@ -1,0 +1,30 @@
+# values.yaml — intentionally insecure for sectl testing
+# Expected: HELM-010 (password in values), HELM-011 (:latest tag)
+
+image:
+  repository: myregistry.io/myapp
+  tag: latest          # HELM-011 MEDIUM — mutable tag
+  pullPolicy: Always
+
+replicaCount: 1
+
+# HELM-010 HIGH — secret stored in values.yaml
+database:
+  host: db.internal
+  port: 5432
+  password: "hardcoded-db-password"   # should use a secret
+  api_key: "sk-prod-abc123xyz"        # should use external-secrets
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+debug: false

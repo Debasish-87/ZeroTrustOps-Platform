@@ -1,0 +1,24 @@
+# bad-rbac.yaml — intentionally overpermissive for sectl testing
+# Expected: K8S-020, K8S-021, K8S-022, K8S-024, K8S-025
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: overpermissive-role
+rules:
+  - apiGroups: ["*"]     # K8S-020 CRITICAL
+    resources: ["*"]     # K8S-022 CRITICAL
+    verbs: ["*"]         # K8S-021 CRITICAL
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dangerous-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin    # K8S-024 CRITICAL
+subjects:
+  - kind: User
+    name: system:unauthenticated   # K8S-025 CRITICAL
+    apiGroup: rbac.authorization.k8s.io

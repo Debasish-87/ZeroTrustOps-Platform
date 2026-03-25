@@ -1,0 +1,37 @@
+# bad-deployment.yaml — intentionally insecure for sectl testing
+# Expected findings: K8S-001, K8S-002, K8S-003, K8S-004, K8S-005, K8S-006,
+#                    K8S-007, K8S-009, K8S-010, K8S-011, K8S-012, K8S-031
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vulnerable-app
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vulnerable-app
+  template:
+    metadata:
+      labels:
+        app: vulnerable-app
+    spec:
+      hostPID: true                        # K8S-001 CRITICAL
+      hostNetwork: true                    # K8S-002 HIGH
+      hostIPC: true                        # K8S-003 HIGH
+      automountServiceAccountToken: true   # K8S-012 MEDIUM
+      containers:
+        - name: app
+          image: nginx:latest              # K8S-009 MEDIUM
+          securityContext:
+            privileged: true               # K8S-004 CRITICAL
+            allowPrivilegeEscalation: true # K8S-005 HIGH
+            runAsNonRoot: false            # K8S-006 HIGH
+            readOnlyRootFilesystem: false  # K8S-007 MEDIUM
+          # No resources block             # K8S-010 MEDIUM
+          # No livenessProbe               # K8S-011 LOW
+          env:
+            - name: DB_PASSWORD
+              value: "supersecret123"      # K8S-031 HIGH
+            - name: API_KEY
+              value: "hardcoded-api-key"   # K8S-031 HIGH

@@ -1,0 +1,96 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-privileged-containers
+  annotations:
+    policies.kyverno.io/title: Disallow Privileged Containers
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: critical
+    policies.kyverno.io/description: >-
+      Privileged containers have nearly unrestricted host access.
+      This policy enforces that no container may run as privileged,
+      and that allowPrivilegeEscalation is explicitly set to false.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: disallow-privileged
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      validate:
+        message: >
+          Privileged containers are not allowed. Remove 'privileged: true'
+          from the container securityContext.
+        pattern:
+          spec:
+            containers:
+              - =(securityContext):
+                  =(privileged): false
+            initContainers:
+              - =(securityContext):
+                  =(privileged): false
+
+    - name: disallow-privilege-escalation
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      validate:
+        message: >
+          allowPrivilegeEscalation must be set to false for all containers.
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  allowPrivilegeEscalation: false
+            initContainers:
+              - securityContext:
+                  allowPrivilegeEscalation: false
+
+    - name: require-run-as-non-root
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      validate:
+        message: >
+          Containers must run as a non-root user.
+          Set runAsNonRoot: true or specify a non-zero runAsUser.
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  runAsNonRoot: true
+
+    - name: disallow-host-namespaces
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      validate:
+        message: >
+          Pod must not use hostPID, hostIPC, or hostNetwork.
+        pattern:
+          spec:
+            =(hostPID): false
+            =(hostIPC): false
+            =(hostNetwork): false
+
+    - name: require-drop-all-capabilities
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      validate:
+        message: >
+          Containers must drop all Linux capabilities.
+          Add capabilities.drop: [ALL] to the container securityContext.
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  capabilities:
+                    drop:
+                      - ALL

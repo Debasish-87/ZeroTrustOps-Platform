@@ -1,0 +1,52 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-latest-tag
+  annotations:
+    policies.kyverno.io/title: Disallow Latest Tag
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Blocks deployment of containers using the :latest image tag.
+      Latest is mutable and defeats reproducibility guarantees.
+      All images must use a specific version tag or digest.
+spec:
+  validationFailureAction: Enforce        # BLOCK — not just audit
+  background: true
+  rules:
+    - name: require-image-tag
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: >
+          Image '{{ request.object.spec.containers[].image }}' uses the :latest tag
+          or has no tag. Images must be pinned to a specific version or digest.
+        pattern:
+          spec:
+            containers:
+              - image: "!*:latest"
+            initContainers:
+              - image: "!*:latest"
+
+    - name: require-non-empty-tag
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: >
+          All container images must have an explicit version tag or @sha256 digest.
+        foreach:
+          - list: "request.object.spec.containers"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.image }}"
+                    operator: NotIn
+                    value:
+                      - "*:*"
+                      - "*@sha256:*"

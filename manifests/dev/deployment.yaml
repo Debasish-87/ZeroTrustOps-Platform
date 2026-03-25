@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zerotrust-app
+  namespace: production
+  labels:
+    app: zerotrust-app
+    version: "1.0.0"
+    owner: darkrootx
+    environment: production
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: zerotrust-app
+  template:
+    metadata:
+      labels:
+        app: zerotrust-app
+        version: "1.0.0"
+    spec:
+      # ── Zero Trust pod-level settings ──────────────────────────────────
+      hostPID: false
+      hostNetwork: false
+      hostIPC: false
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+
+      containers:
+        - name: app
+          # Pin image by digest for supply-chain integrity
+          image: nginx:1.25-alpine
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+
+          # ── Container-level security context ─────────────────────────
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop: ["ALL"]
+
+          # ── Resource limits (prevents resource exhaustion) ─────────────
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+          # ── Environment (secrets via secretKeyRef, not plain text) ─────
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: db-password
+            - name: APP_ENV
+              value: "production"
+
+          # ── Health probes ──────────────────────────────────────────────
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          # ── Volume mounts (writable tmpfs only) ───────────────────────
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: nginx-cache
+          emptyDir: {}
+
+      # ── Pull from private registry (configure your registry secret) ───
+      # imagePullSecrets:
+      #   - name: registry-credentials

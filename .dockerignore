@@ -1,0 +1,6 @@
+.git
+sectl/bin/
+node_modules/
+__pycache__/
+*.pyc
+.env

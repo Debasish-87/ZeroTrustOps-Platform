@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: zerotrust-app
+  namespace: production
+  labels:
+    app: zerotrust-app
+spec:
+  selector:
+    app: zerotrust-app
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP  # Never NodePort or LoadBalancer unless explicitly needed
