@@ -15,7 +15,7 @@
 
 ### **Self-Hosted DevSecOps for Kubernetes — Scan Every Push. Block Misconfigurations Before They Reach Production.**
 
-A production-grade Micro Services , self-hosted DevSecOps platform that automatically scans repositories for security misconfigurations, hardcoded secrets, and infrastructure vulnerabilities on every Git push — before it ever reaches production.
+A self-hosted DevSecOps platform that scans every Git push and blocks security misconfigurations, hardcoded secrets, and infrastructure vulnerabilities before they reach production.
 
 [🚀 Quick Start](#-quick-start) · [📖 Documentation](#-architecture) · [🛡️ SecTL Engine](#-sectl--security-enforcement-engine) · [🗺️ Roadmap](#-roadmap) · [🤝 Contributing](#-contributing)
 
@@ -66,13 +66,14 @@ git push
                           └── Dashboard displays results
 ```
 
-**Key capabilities:**
-- 🔍 **Static analysis** across Kubernetes, Terraform, Helm, and container images
-- 🔑 **Secrets detection** — catches hardcoded credentials before they reach remote
-- 🌐 **Live AWS posture audits** — IAM, MFA, S3, root key exposure
-- ⛓️ **Supply chain checks** — digest pinning, EOL images, `:latest` tag enforcement
-- 🚦 **CI/CD gate** — binary PASS/FAIL exit codes suitable for any pipeline
-- 📊 **Real-time dashboard** with per-finding remediation guidance
+## 🚀 What it actually does
+
+- 🚫 **Blocks insecure Kubernetes deployments** before they ever reach your cluster  
+- 🔑 **Prevents secrets from leaving your repo** by detecting hardcoded credentials on every push  
+- 🚦 **Fails CI instantly on critical issues** with a clear PASS/FAIL security gate  
+- 🛡️ **Enforces security policies at deployment time** using admission control (Kyverno)  
+- 🔍 **Detects misconfigurations across IaC and containers** (Kubernetes, Terraform, Helm, images)  
+- 📊 **Gives actionable insights, not just logs** — every finding includes exact fixes and context
 
 ---
 
@@ -455,6 +456,16 @@ API_PORT=8000
 - [ ] GitLab webhook support
 
 ---
+
+## 🤔 Why not just use Trivy / Checkov?
+
+| Capability | ZeroTrustOps | Traditional Scanners |
+|-----------|-------------|---------------------|
+| Auto scan on every push | ✅ | ❌ |
+| CI/CD enforcement (fail builds) | ✅ | ⚠️ partial |
+| Policy enforcement (Kyverno) | ✅ | ❌ |
+| End-to-end pipeline | ✅ | ❌ |
+
 
 ## 🤝 Contributing
 
