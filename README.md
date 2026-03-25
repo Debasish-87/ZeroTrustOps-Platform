@@ -92,11 +92,11 @@ All services run in **Docker Compose** and communicate over an internal bridge n
 ┌────────────────────────────────────────────────────────────┐
 │                     Docker Compose Network                 │
 │                                                            │
-│  ┌──────────────┐    ┌──────────────┐    ┌─────────────┐  │
-│  │  React       │    │  FastAPI     │    │ PostgreSQL  │  │
-│  │  Dashboard   │◄──►│  Backend     │◄──►│    16       │  │
-│  │  :3000       │    │  :8000       │    │  :5432      │  │
-│  └──────────────┘    └──────┬───────┘    └─────────────┘  │
+│  ┌──────────────┐    ┌──────────────┐    ┌─────────────┐   │
+│  │  React       │    │  FastAPI     │    │ PostgreSQL  │   │
+│  │  Dashboard   │◄──►│  Backend     │◄──►│    16       │   │
+│  │  :3000       │    │  :8000       │    │  :5432      │   │
+│  └──────────────┘    └──────┬───────┘    └─────────────┘   │
 │                             │                              │
 │                    ┌────────▼────────┐                     │
 │                    │   SecTL CLI     │                     │
@@ -123,7 +123,7 @@ SecTL is a purpose-built CLI tool written in Go. It scans Infrastructure-as-Code
 | Type            | Target                   | Coverage                                                              |
 |-----------------|--------------------------|-----------------------------------------------------------------------|
 | `k8s`           | Kubernetes manifests     | Pods, Deployments, RBAC, Ingress, ConfigMaps, ServiceAccounts         |
-| `terraform`     | Infrastructure as Code   | AWS, GCP, Azure — S3, IAM, Security Groups, RDS, EKS, CloudTrail     |
+| `terraform`     | Infrastructure as Code   | AWS, GCP, Azure — S3, IAM, Security Groups, RDS, EKS, CloudTrail      |
 | `helm`          | Helm charts              | Chart.yaml, values.yaml, rendered templates                           |
 | `posture`       | Live AWS account         | IAM root keys, MFA enforcement, password policy, S3 bucket posture    |
 | `supply-chain`  | Container images         | Digest pinning, `:latest` tag detection, EOL base images              |
@@ -138,7 +138,7 @@ SecTL is a purpose-built CLI tool written in Go. It scans Infrastructure-as-Code
 | K8S-004   | 🔴 CRITICAL  | Privileged container — full host device access       |
 | K8S-020   | 🔴 CRITICAL  | RBAC wildcard `apiGroups` (`*`)                      |
 | K8S-024   | 🔴 CRITICAL  | Binding to `cluster-admin` role                      |
-| K8S-025   | 🔴 CRITICAL  | Binding to unauthenticated/anonymous subject          |
+| K8S-025   | 🔴 CRITICAL  | Binding to unauthenticated/anonymous subject         |
 | K8S-031   | 🟠 HIGH      | Hardcoded secret in environment variable             |
 | K8S-005   | 🟠 HIGH      | `allowPrivilegeEscalation` not set to `false`        |
 
@@ -216,7 +216,7 @@ The `setup.sh` script will automatically:
 |-------------------|--------------------------------|---------------------------|
 | 📊 Dashboard      | http://localhost:3000          | React UI — main interface |
 | ⚡ API            | http://localhost:8000          | FastAPI backend            |
-| 📖 API Reference  | http://localhost:8000/docs     | Swagger / OpenAPI docs     |
+| 📖 API Reference  | http://localhost:8000/docs     | Swagger / OpenAPI docs    |
 
 ### GitHub Webhook Integration
 
@@ -376,7 +376,7 @@ Each `finding` record stores:
 | Field         | Type    | Description                                   |
 |---------------|---------|-----------------------------------------------|
 | `tool`        | text    | `sectl` or `gitleaks`                         |
-| `rule_id`     | text    | e.g. `K8S-001`, `TF-IAM-001`                 |
+| `rule_id`     | text    | e.g. `K8S-001`, `TF-IAM-001`                  |
 | `severity`    | text    | `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`           |
 | `category`    | text    | e.g. `rbac`, `network`, `secrets`             |
 | `title`       | text    | Short rule description                        |
@@ -436,9 +436,9 @@ API_PORT=8000
 
 | Service    | Internal Port | External Port | Configurable |
 |------------|---------------|---------------|--------------|
-| Dashboard  | 3000          | 3000          | ✅            |
-| API        | 8000          | 8000          | ✅            |
-| PostgreSQL | 5432          | 5432          | ✅            |
+| Dashboard  | 3000          | 3000          | ✅           |
+| API        | 8000          | 8000          | ✅           |
+| PostgreSQL | 5432          | 5432          | ✅           |
 
 ---
 
