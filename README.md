@@ -63,6 +63,7 @@ Powered by a custom enforcement engine (SecTL), along with Gitleaks for secrets 
 
 Every push is treated as a security checkpoint. If it fails, it never deploys.
 
+```
 git push
   └── GitHub webhook triggers the scan pipeline
         └── Repository is cloned into an isolated scan environment
@@ -93,6 +94,7 @@ git push
                     ├── Displays repo status (PASS / FAIL)
                     ├── Shows severity breakdown
                     └── Provides actionable fixes per finding
+```
 
 ## 🚀 What it actually does
 
